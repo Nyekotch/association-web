@@ -1,6 +1,8 @@
 import api from './api';
 
+const apiInstance = api;
+
 export const uploadFile = (formData) =>
-  api.post('/uploads', formData, {
+  apiInstance.post('/uploads', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });

@@ -1,3 +1,5 @@
 import api from './api';
 
-export const createDonation = (data) => api.post('/donations', data);
+const apiInstance = api;
+
+export const createDonation = (data) => apiInstance.post('/donations', data);

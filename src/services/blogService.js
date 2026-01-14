@@ -1,7 +1,9 @@
 import api from './api';
 
-export const getAllArticles = () => api.get('/blog');
-export const getArticleById = (id) => api.get(`/blog/${id}`);
-export const createArticle = (data) => api.post('/blog', data);
-export const updateArticle = (id, data) => api.patch(`/blog/${id}`, data);
-export const deleteArticle = (id) => api.delete(`/blog/${id}`);
+const apiInstance = api;
+
+export const getAllArticles = () => apiInstance.get('/blog');
+export const getArticleById = (id) => apiInstance.get(`/blog/${id}`);
+export const createArticle = (data) => apiInstance.post('/blog', data);
+export const updateArticle = (id, data) => apiInstance.patch(`/blog/${id}`, data);
+export const deleteArticle = (id) => apiInstance.delete(`/blog/${id}`);
