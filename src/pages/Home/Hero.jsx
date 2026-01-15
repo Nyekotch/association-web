@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Globe } from "lucide-react";
 
 export default function Hero() {
@@ -17,11 +18,11 @@ export default function Hero() {
         <h1 className="text-xl font-semibold">Association</h1>
 
         <nav className="hidden md:flex items-center gap-8 text-sm">
-          <a href="/">Accueil</a>
-          <a href="/events">Événements</a>
-          <a href="/blog">Blog</a>
-          <a href="/forum">Forum</a>
-          <a href="/donations">Dons</a>
+          <Link to="/">Accueil</Link>
+          <Link to="/events">Événements</Link>
+          <Link to="/blog">Blog</Link>
+          <Link to="/forum">Forum</Link>
+          <Link to="/donations">Dons</Link>
         </nav>
 
         <div className="flex items-center gap-4">
