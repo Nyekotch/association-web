@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Globe, Menu, X } from "lucide-react";
 import { useState } from "react";
+import heroImage from "../../assets/images/IMG_9149.JPG";
 
 export default function Hero() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -9,7 +10,7 @@ export default function Hero() {
     <section
       className="relative h-screen w-full bg-cover bg-center"
       style={{
-        backgroundImage: "url('/src/assets/images/IMG_9149.JPG')",
+        backgroundImage: `url(${heroImage})`,
       }}
     >
       {/* Overlay */}
