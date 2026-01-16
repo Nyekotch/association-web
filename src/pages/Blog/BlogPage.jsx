@@ -63,9 +63,13 @@ const BlogPage = () => {
                 <img 
                   src={article.featuredimage.startsWith('http') 
                     ? article.featuredimage 
-                    : `${getApiBaseUrl()}${article.featuredimage}`}
+                    : `${getApiBaseUrl()}${article.featuredimage.startsWith('/') ? '' : '/'}${article.featuredimage}`}
                   alt={article.title}
                   className="w-full h-48 sm:h-64 object-cover"
+                  onError={(e) => {
+                    e.target.style.display = 'none';
+                    e.target.parentElement.innerHTML = '<div class="w-full h-48 sm:h-64 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center"><div class="text-4xl sm:text-5xl opacity-50">📝</div></div>';
+                  }}
                 />
               )}
               <div className="p-6">

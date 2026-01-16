@@ -40,7 +40,9 @@ const ImageUpload = ({ onImageUploaded, currentImage }) => {
       const response = await uploadFile(formData);
       console.log('Réponse du serveur:', response);
       
-      const imageUrl = `${getApiBaseUrl()}${response.data.url}`;
+      const imageUrl = response.data.url.startsWith('http') 
+        ? response.data.url 
+        : `${getApiBaseUrl()}${response.data.url.startsWith('/') ? '' : '/'}${response.data.url}`;
       
       // Remplacer la prévisualisation locale par l'URL du serveur
       URL.revokeObjectURL(localPreview);

@@ -139,10 +139,14 @@ const EventDetail = () => {
           <img 
             src={event.imageurl.startsWith('http') 
               ? event.imageurl 
-              : `${getApiBaseUrl()}${event.imageurl}`
+              : `${getApiBaseUrl()}${event.imageurl.startsWith('/') ? '' : '/'}${event.imageurl}`
             } 
             alt={event.title}
             className="w-full h-64 md:h-96 object-cover"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.innerHTML = '<div class="w-full h-64 md:h-96 bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center"><div class="text-6xl opacity-50">📅</div></div>';
+            }}
           />
         )}
         

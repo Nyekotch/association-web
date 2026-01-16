@@ -210,9 +210,19 @@ const EventsPage = () => {
                     <img 
                       src={event.imageurl.startsWith('http') 
                         ? event.imageurl 
-                        : `${getApiBaseUrl()}${event.imageurl}`}
+                        : `${getApiBaseUrl()}${event.imageurl.startsWith('/') ? '' : '/'}${event.imageurl}`}
                       alt={event.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = `
+                          <div class="w-full h-full flex items-center justify-center">
+                            <div class="text-4xl sm:text-5xl opacity-50">
+                              ${getEventTypeIcon(event.type)}
+                            </div>
+                          </div>
+                        `;
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">

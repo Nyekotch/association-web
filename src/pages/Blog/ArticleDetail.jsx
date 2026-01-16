@@ -67,10 +67,14 @@ const ArticleDetail = () => {
           <img 
             src={article.featuredimage.startsWith('http') 
               ? article.featuredimage 
-              : `${getApiBaseUrl()}${article.featuredimage}`
+              : `${getApiBaseUrl()}${article.featuredimage.startsWith('/') ? '' : '/'}${article.featuredimage}`
             } 
             alt={article.title}
             className="w-full h-64 md:h-96 object-cover"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentElement.innerHTML = '<div class="w-full h-64 md:h-96 bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center"><div class="text-6xl opacity-50">📝</div></div>';
+            }}
           />
         )}
         
