@@ -79,32 +79,32 @@ const LoginForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-sm mx-auto">
       <div className="space-y-1">
-        <label className="text-sm text-gray-700">Email</label>
+        <label className="text-sm font-medium text-gray-700">Email</label>
         <input 
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full rounded-md border border-gray-300 px-3 py-2" 
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
           type="email" 
           placeholder="vous@example.com" 
           required
         />
       </div>
       <div className="space-y-1">
-        <label className="text-sm text-gray-700">Mot de passe</label>
+        <label className="text-sm font-medium text-gray-700">Mot de passe</label>
         <input 
           name="password"
           value={formData.password}
           onChange={handleChange}
-          className="w-full rounded-md border border-gray-300 px-3 py-2" 
+          className="w-full rounded-md border border-gray-300 px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
           type="password" 
-          placeholder="••••••••" 
+          placeholder="•••••••" 
           required
         />
       </div>
-      <Button type="submit" disabled={loading} className="w-full">
+      <Button type="submit" disabled={loading} className="w-full text-base py-3">
         {loading ? 'Connexion...' : 'Se connecter'}
       </Button>
     </form>

@@ -56,17 +56,16 @@ const BlogPage = () => {
       {articles.length === 0 ? (
         <p className="text-gray-600">Aucun article publié pour le moment.</p>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {articles.map((article) => (
             <article key={article.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
               {article.featuredimage && (
                 <img 
                   src={article.featuredimage.startsWith('http') 
                     ? article.featuredimage 
-                    : `${getApiBaseUrl()}${article.featuredimage}`
-                  } 
+                    : `${getApiBaseUrl()}${article.featuredimage}`}
                   alt={article.title}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-48 sm:h-64 object-cover"
                 />
               )}
               <div className="p-6">
@@ -83,7 +82,7 @@ const BlogPage = () => {
                 <div className="flex items-center justify-between">
                   <Link 
                     to={`/blog/${article.id}`} 
-                    className="text-blue-600 hover:text-blue-800 font-medium"
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm sm:text-base"
                   >
                     Lire la suite
                   </Link>

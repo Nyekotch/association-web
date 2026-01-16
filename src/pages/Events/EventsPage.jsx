@@ -142,19 +142,7 @@ const EventsPage = () => {
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="flex items-center">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <div className="text-2xl">👥</div>
-              </div>
-              <div className="ml-4">
-                <div className="text-2xl font-bold text-purple-600">
-                  {events.reduce((acc, event) => acc + (event.capacity || 0), 0)}
-                </div>
-                <div className="text-sm text-gray-600">Places totales</div>
-              </div>
-            </div>
-          </div>
+    
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center">
               <div className="p-3 bg-orange-100 rounded-lg">
@@ -213,7 +201,7 @@ const EventsPage = () => {
             </div>
           </div>
         ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <div key={event.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-xl transform hover:scale-105 transition-all duration-300">
                 {/* Image ou placeholder */}
@@ -222,14 +210,13 @@ const EventsPage = () => {
                     <img 
                       src={event.imageurl.startsWith('http') 
                         ? event.imageurl 
-                        : `${getApiBaseUrl()}${event.imageurl}`
-                      } 
+                        : `${getApiBaseUrl()}${event.imageurl}`}
                       alt={event.title}
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-6xl opacity-50">
+                      <div className="text-4xl sm:text-5xl opacity-50">
                         {getEventTypeIcon(event.type)}
                       </div>
                     </div>
@@ -237,7 +224,7 @@ const EventsPage = () => {
                   
                   {/* Badges */}
                   <div className="absolute top-3 left-3 flex flex-col gap-2">
-                    <span className={`text-xs px-3 py-1 rounded-full font-semibold shadow-lg ${
+                    <span className={`text-xs px-2 py-1 rounded-full font-semibold shadow-lg ${
                       isUpcoming(event.enddate) 
                         ? 'bg-gradient-to-r from-green-500 to-emerald-600 text-white' 
                         : 'bg-gradient-to-r from-gray-500 to-gray-600 text-white'
@@ -245,34 +232,34 @@ const EventsPage = () => {
                       {isUpcoming(event.enddate) ? '🚀 À venir' : '✅ Terminé'}
                     </span>
                     {event.ispublished && (
-                      <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs px-3 py-1 rounded-full font-semibold shadow-lg">
+                      <span className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white text-xs px-2 py-1 rounded-full font-semibold shadow-lg">
                         📢 Publié
                       </span>
                     )}
                   </div>
                 </div>
                 
-                <div className="p-6">
+                <div className="p-4 sm:p-6">
                   {/* Titre et type */}
                   <div className="mb-3">
                     <div className={`inline-block px-2 py-1 rounded-lg text-xs font-semibold text-white bg-gradient-to-r ${getEventTypeColor(event.type)} mb-2`}>
                       {getEventTypeIcon(event.type)} {event.type || 'Événement'}
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
+                    <h2 className="text-lg sm:text-xl font-bold text-gray-900 hover:text-indigo-600 transition-colors">
                       {event.title}
                     </h2>
                   </div>
                   
                   {/* Description */}
-                  <p className="text-gray-600 mb-4 line-clamp-3">
+                  <p className="text-gray-600 mb-4 line-clamp-3 text-sm sm:text-base">
                     {event.description || 'Aucune description disponible'}
                   </p>
                   
                   {/* Informations */}
-                  <div className="space-y-3 text-sm">
+                  <div className="space-y-3 text-sm sm:text-base">
                     <div className="flex items-center text-gray-700">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                        <div className="text-lg">📅</div>
+                      <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                        <div className="text-sm sm:text-lg">📅</div>
                       </div>
                       <div>
                         <div className="font-medium">Date</div>
@@ -282,8 +269,8 @@ const EventsPage = () => {
                     
                     {event.location && (
                       <div className="flex items-center text-gray-700">
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-                          <div className="text-lg">📍</div>
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                          <div className="text-sm sm:text-lg">📍</div>
                         </div>
                         <div>
                           <div className="font-medium">Lieu</div>
@@ -294,8 +281,8 @@ const EventsPage = () => {
                     
                     {event.capacity && (
                       <div className="flex items-center text-gray-700">
-                        <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                          <div className="text-lg">👥</div>
+                        <div className="w-6 h-6 sm:w-8 sm:h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                          <div className="text-sm sm:text-lg">👥</div>
                         </div>
                         <div>
                           <div className="font-medium">Capacité</div>

@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Header from './components/common/Header';
+import Navbar from './components/common/Navbar';
 import Footer from './components/common/Footer';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import AdminRoute from './components/auth/AdminRoute';
 import Home from './pages/Home/Home';
 import About from './pages/About';
 import EventsPage from './pages/Events/EventsPage';
@@ -19,21 +20,27 @@ import ForumPage from './pages/Forum/ForumPage';
 import TopicDetail from './pages/Forum/TopicDetail';
 import Dashboard from './components/user/Dashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
+import UserManagement from './components/admin/UserManagement';
+import EventManagement from './components/admin/EventManagement';
+import BlogManagement from './components/admin/BlogManagement';
+import DonationManagement from './components/admin/DonationManagement';
+import AdminSettings from './components/admin/AdminSettings';
+import ForumManagement from './components/admin/ForumManagement';
 
 const Layout = ({ children }) => (
   <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800">
-    <Header />
+    <Navbar />
     <main className="flex-1">{children}</main>
     <Footer />
   </div>
 );
 
-const HomeLayout = ({ children }) => (
-  <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800">
-    <main className="flex-1">{children}</main>
-    <Footer />
-  </div>
-);
+ const HomeLayout = ({ children }) => (
+   <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800">
+     <main className="flex-1">{children}</main>
+     <Footer />
+   </div>
+ );
 
 const Router = () => {
   return (
@@ -47,10 +54,22 @@ const Router = () => {
         <Route path="/" element={<HomeLayout><Home /></HomeLayout>} />
         <Route path="/about" element={<Layout><About /></Layout>} />
         <Route path="/events" element={<Layout><EventsPage /></Layout>} />
-        <Route path="/events/create" element={<Layout><CreateEvent /></Layout>} />
+        <Route path="/events/create" element={
+          <Layout>
+            <ProtectedRoute>
+              <CreateEvent />
+            </ProtectedRoute>
+          </Layout>
+        } />
         <Route path="/events/:id" element={<Layout><EventDetail /></Layout>} />
         <Route path="/blog" element={<Layout><BlogPage /></Layout>} />
-        <Route path="/blog/create" element={<Layout><CreateArticle /></Layout>} />
+        <Route path="/blog/create" element={
+          <Layout>
+            <ProtectedRoute>
+              <CreateArticle />
+            </ProtectedRoute>
+          </Layout>
+        } />
         <Route path="/blog/:id" element={<Layout><ArticleDetail /></Layout>} />
         <Route path="/donations" element={<Layout><DonationPage /></Layout>} />
         <Route path="/membership" element={<Layout><MembershipForm /></Layout>} />
@@ -68,12 +87,72 @@ const Router = () => {
           }
         />
         <Route
+          path="/admin/users"
+          element={
+            <Layout>
+              <AdminRoute>
+                <UserManagement />
+              </AdminRoute>
+            </Layout>
+          }
+        />
+        <Route
           path="/admin/dashboard"
           element={
             <Layout>
-              <ProtectedRoute>
+              <AdminRoute>
                 <AdminDashboard />
-              </ProtectedRoute>
+              </AdminRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/events"
+          element={
+            <Layout>
+              <AdminRoute>
+                <EventManagement />
+              </AdminRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/blog"
+          element={
+            <Layout>
+              <AdminRoute>
+                <BlogManagement />
+              </AdminRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/forum"
+          element={
+            <Layout>
+              <AdminRoute>
+                <ForumManagement />
+              </AdminRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/donations"
+          element={
+            <Layout>
+              <AdminRoute>
+                <DonationManagement />
+              </AdminRoute>
+            </Layout>
+          }
+        />
+        <Route
+          path="/admin/settings"
+          element={
+            <Layout>
+              <AdminRoute>
+                <AdminSettings />
+              </AdminRoute>
             </Layout>
           }
         />
