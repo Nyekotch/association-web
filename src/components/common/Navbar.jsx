@@ -23,6 +23,7 @@ const Navbar = () => {
 
   const navLinks = [
     { to: getHomeLink(), label: 'Accueil' },
+    { to: '/about', label: 'À propos' },
     { to: '/events', label: 'Événements' },
     { to: '/blog', label: 'Blog' },
     { to: '/forum', label: 'Forum' },
