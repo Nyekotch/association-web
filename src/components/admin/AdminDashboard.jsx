@@ -68,7 +68,17 @@ const AdminDashboard = () => {
       setUsers(usersData.slice(0, 5));
     } catch (error) {
       console.error('Erreur lors du chargement des données admin:', error);
-      toast.error('Erreur lors du chargement des données');
+      
+      // Si l'erreur est 401, rediriger vers la page de connexion
+      if (error.response?.status === 401) {
+        toast.error('Session expirée. Veuillez vous reconnecter.');
+        // Vider le store d'authentification
+        useAuthStore.getState().logout();
+        navigate('/login');
+        return;
+      }
+      
+      toast.error('Erreur lors du chargement des données admin');
     } finally {
       setLoading(false);
     }
