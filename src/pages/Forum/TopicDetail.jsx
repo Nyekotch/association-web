@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getTopicById, getPostsByTopic, createPost, updatePost, deletePost } from '../../services/forumService';
+import { getTopicById, getPostsByTopic, createPost, updatePost, deletePost, incrementTopicViews } from '../../services/forumService';
 import useAuthStore from '../../stores/authStore';
 import toast from 'react-hot-toast';
 
@@ -38,6 +38,14 @@ const TopicDetail = () => {
       ]);
       setTopic(topicResponse.data);
       setPosts(postsResponse.data);
+      
+      // Incrémenter les vues du sujet
+      try {
+        await incrementTopicViews(id);
+      } catch (viewError) {
+        // Silently fail - ne pas bloquer l'affichage si l'incrément échoue
+        console.log('Incrément de vues non disponible:', viewError.message);
+      }
     } catch (error) {
       toast.error('Sujet non trouvé');
       navigate('/forum');
