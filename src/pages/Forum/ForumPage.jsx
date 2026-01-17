@@ -354,7 +354,7 @@ function ForumPage() {
                 filteredTopics.map((topic) => (
                   <div key={topic.id} className="border-b border-gray-200">
                     {/* Mobile Card Layout */}
-                    <div className="lg:hidden p-4">
+                    <div className="lg:hidden p-4 cursor-pointer" onClick={() => handleTopicClick(topic.id)}>
                       <div className="space-y-3">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
