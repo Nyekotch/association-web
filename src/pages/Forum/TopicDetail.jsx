@@ -20,6 +20,10 @@ const TopicDetail = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [searchTerm, setSearchTerm] = useState('');
 
+  // États pour le chat
+  const [messages, setMessages] = useState([]);
+  const [inputMessage, setInputMessage] = useState("");
+
   useEffect(() => {
     fetchTopicData();
   }, [id]);
@@ -38,6 +42,16 @@ const TopicDetail = () => {
       ]);
       setTopic(topicResponse.data);
       setPosts(postsResponse.data);
+      
+      // Initialiser le chat avec les posts du forum
+      const chatMessagesFromPosts = postsResponse.data.map(post => ({
+        id: post.id,
+        text: post.content,
+        sender: post.authorid === user?.id ? "me" : "other",
+        time: new Date(post.createdat).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
+        author: post.author?.name || "Utilisateur anonyme"
+      }));
+      setMessages(chatMessagesFromPosts);
       
       // Incrémenter les vues du sujet
       try {
@@ -58,23 +72,17 @@ const TopicDetail = () => {
     e.preventDefault();
     if (!user) {
       toast.error('Vous devez être connecté pour répondre');
-      navigate('/login');
       return;
     }
 
     if (!newPost.trim()) {
-      toast.error('Veuillez écrire une réponse');
+      toast.error('Veuillez écrire un contenu');
       return;
     }
 
     setSubmitting(true);
     try {
-      await createPost({
-        content: newPost,
-        topicid: id,
-        authorid: user.id
-      });
-      
+      await createPost(id, { content: newPost });
       toast.success('Réponse ajoutée !');
       setNewPost('');
       fetchTopicData(); // Rafraîchir les posts
@@ -124,45 +132,79 @@ const TopicDetail = () => {
     }
   };
 
+  // Fonctions de gestion du chat
+  const handleSendMessage = async () => {
+    if (inputMessage.trim()) {
+      // Créer un nouveau post dans le Forum
+      try {
+        await createPost({
+          topicId: id,
+          authorId: user?.id,
+          content: inputMessage
+        });
+        toast.success('Message envoyé avec succès !');
+        setInputMessage("");
+        fetchTopicData(); // Rafraîchir les posts et le chat
+      } catch (error) {
+        toast.error(error.response?.data?.message || 'Erreur lors de l\'envoi du message');
+      }
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
   const canEditPost = (post) => {
     return user && post.authorid === user.id;
   };
 
-  const filteredAndSortedPosts = posts
-    .filter(post => 
-      searchTerm === '' || 
-      post.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      post.author?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === 'newest') {
-        return new Date(b.createdat) - new Date(a.createdat);
-      } else if (sortBy === 'oldest') {
-        return new Date(a.createdat) - new Date(b.createdat);
-      } else if (sortBy === 'popular') {
-        return (b.likescount || 0) - (a.likescount || 0);
+  // Grouper les messages par jour
+  const groupMessagesByDay = (messages, posts) => {
+    const grouped = {};
+    
+    messages.forEach((message, index) => {
+      // Utiliser la date complète du post correspondant
+      const post = posts[index];
+      if (!post) return;
+      
+      const messageDate = new Date(post.createdat);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
+      
+      let dateKey;
+      if (messageDate.toDateString() === today.toDateString()) {
+        dateKey = "Aujourd'hui";
+      } else if (messageDate.toDateString() === yesterday.toDateString()) {
+        dateKey = "Hier";
+      } else {
+        dateKey = messageDate.toLocaleDateString('fr-FR', { 
+          day: 'numeric', 
+          month: 'long', 
+          year: 'numeric' 
+        });
       }
-      return 0;
+      
+      if (!grouped[dateKey]) {
+        grouped[dateKey] = [];
+      }
+      grouped[dateKey].push(message);
     });
-
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    
+    return grouped;
   };
+
+  const groupedMessages = groupMessagesByDay(messages, posts);
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <div className="max-w-6xl mx-auto px-6 py-10">
-          <div className="flex items-center justify-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-r-2 border-t-2 border-indigo-600"></div>
-            <p className="ml-4 text-gray-600">Chargement de la discussion...</p>
-          </div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-r-2 border-t-2 border-orange-500"></div>
+          <p className="mt-4 text-gray-600">Chargement du sujet...</p>
         </div>
       </div>
     );
@@ -170,315 +212,196 @@ const TopicDetail = () => {
 
   if (!topic) {
     return (
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="text-center text-red-600">
-          Sujet non trouvé
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🔍</div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Sujet non trouvé</h3>
+          <p className="text-gray-600">Ce sujet n'existe pas ou a été supprimé.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <button 
-              onClick={() => navigate('/forum')}
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Header with gradient */}
+      <div className="h-1 bg-gradient-to-r from-orange-400 via-orange-300 to-yellow-300"></div>
+
+      {/* Topic Header */}
+      <div className="bg-white shadow-lg border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+          {/* Back Button */}
+          <button
+            onClick={() => navigate('/forum')}
+            className="mb-4 sm:mb-6 inline-flex items-center gap-2 text-gray-600 hover:text-orange-500 transition-all duration-200 hover:translate-x-[-2px]"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             >
-              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Retour au forum
-            </button>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-500">
-                {posts.length} réponse{posts.length > 1 ? 's' : ''}
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            <span className="text-sm sm:text-base font-medium">Retour au forum</span>
+          </button>
+
+          {/* Topic Information */}
+          <div className="space-y-3 sm:space-y-4">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl xl:text-4xl font-bold text-gray-900 leading-tight">
+              {topic.title}
+            </h1>
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600">
+              <div className="flex items-center gap-1">
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-orange-400 to-orange-500 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold">
+                  {topic.creator?.name?.charAt(0)?.toUpperCase() || '?'}
+                </div>
+                <span className="font-medium">{topic.creator?.name || 'Utilisateur anonyme'}</span>
+              </div>
+              <span className="hidden sm:inline text-gray-400">•</span>
+              <span className="flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                {new Date(topic.createdat).toLocaleDateString('fr-FR', { 
+                  day: 'numeric', 
+                  month: 'short', 
+                  year: 'numeric'
+                })}
               </span>
-              <span className="text-sm text-gray-500">
-                {topic.viewcount || 0} vue{topic.viewcount > 1 ? 's' : ''}
+              <span className="hidden sm:inline text-gray-400">•</span>
+              <span className="flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                  <circle cx="12" cy="12" r="3"></circle>
+                </svg>
+                {topic.viewcount || 0}
+              </span>
+              <span className="hidden sm:inline text-gray-400">•</span>
+              <span className="flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                {posts.length}
               </span>
             </div>
+            {topic.description && (
+              <div className="bg-gray-50 rounded-lg p-3 sm:p-4 border-l-4 border-orange-400">
+                <p className="text-sm sm:text-base text-gray-700 leading-relaxed">{topic.description}</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 py-8 space-y-8">
-        {/* Sujet principal */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold text-white mb-3">{topic.title}</h1>
-                <div className="flex items-center space-x-4 text-indigo-100">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center text-white font-bold mr-3">
-                      {topic.creator?.name?.charAt(0) || topic.author?.name?.charAt(0) || '?'}
-                    </div>
-                    <span className="font-medium">
-                      {topic.creator?.name || topic.author?.name || 'Utilisateur anonyme'}
-                    </span>
-                  </div>
-                  <span>•</span>
-                  <span>{formatDate(topic.createdat)}</span>
-                  {topic.ispinned && (
-                    <span className="flex items-center">
-                      <div className="text-lg mr-1">📌</div>
-                      Épinglé
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="p-8">
-            <div className="prose prose-lg max-w-none text-gray-700">
-              <p className="text-lg leading-relaxed">{topic.description || topic.content}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Barre d'outils de discussion */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Rechercher dans les réponses..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-64"
-                />
-                <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              >
-                <option value="newest">Plus récents</option>
-                <option value="oldest">Plus anciens</option>
-                <option value="popular">Plus populaires</option>
-              </select>
-            </div>
-            
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
-              <span>{filteredAndSortedPosts.length} réponse{filteredAndSortedPosts.length > 1 ? 's' : ''}</span>
-              {searchTerm && (
-                <span className="text-indigo-600">• filtré</span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        
-        {/* Discussion - Réponses */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-          <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-6 border-b border-gray-200">
-            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
-              <div className="text-3xl mr-3">💭</div>
-              Discussion
-              <span className="ml-3 text-lg font-normal text-gray-600">
-                ({filteredAndSortedPosts.length} réponse{filteredAndSortedPosts.length > 1 ? 's' : ''})
-              </span>
+      {/* Chat Messages Area */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100">
+          <div className="bg-gradient-to-r from-orange-50 to-yellow-50 px-4 sm:px-6 py-3 border-b border-gray-200">
+            <h2 className="text-sm sm:text-base font-semibold text-gray-800 flex items-center gap-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+              Discussion ({posts.length} messages)
             </h2>
           </div>
           
-          {filteredAndSortedPosts.length === 0 ? (
-            <div className="p-16 text-center">
-              <div className="text-6xl mb-4">🌱</div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {searchTerm ? 'Aucune réponse trouvée' : 'Soyez le premier à répondre !'}
-              </h3>
-              <p className="text-gray-600 max-w-md mx-auto">
-                {searchTerm 
-                  ? 'Essayez de modifier votre recherche pour trouver des réponses.'
-                  : 'Lancez la conversation en partageant votre point de vue.'
-                }
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-100">
-              {filteredAndSortedPosts.map((post, index) => (
-                <div key={post.id} className="p-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-start space-x-4">
-                    <div className="relative">
-                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
-                        {post.author?.name?.charAt(0) || '?'}
-                      </div>
-                      {index === 0 && (
-                        <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                          1
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <span className="font-semibold text-gray-900 text-lg">
-                            {post.author?.name || 'Utilisateur anonyme'}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {formatDate(post.createdat)}
-                          </span>
-                          {post.likescount > 0 && (
-                            <span className="flex items-center text-sm text-red-500">
-                              <div className="text-lg mr-1">❤️</div>
-                              {post.likescount}
-                            </span>
-                          )}
-                        </div>
-                        {canEditPost(post) && (
-                          <div className="relative">
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setActiveMenu(activeMenu === post.id ? null : post.id);
-                              }}
-                              className="text-gray-400 hover:text-gray-600 p-2 rounded-full hover:bg-gray-100 transition-colors"
-                            >
-                              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-                              </svg>
-                            </button>
-                            
-                            {activeMenu === post.id && (
-                              <div className="absolute right-0 mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-200 z-10">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveMenu(null);
-                                    handleEditPost(post);
-                                  }}
-                                  className="w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-t-lg flex items-center"
-                                >
-                                  <span className="mr-2">✏️</span>
-                                  Modifier
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setActiveMenu(null);
-                                    handleDeletePost(post.id);
-                                  }}
-                                  disabled={deletingPost === post.id}
-                                  className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-b-lg disabled:opacity-50 flex items-center"
-                                >
-                                  <span className="mr-2">🗑️</span>
-                                  {deletingPost === post.id ? 'Suppression...' : 'Supprimer'}
-                                </button>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                      
-                      {editingPost === post.id ? (
-                        <div className="space-y-4">
-                          <textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-                            rows={4}
-                          />
-                          <div className="flex justify-end space-x-3">
-                            <button
-                              onClick={() => {
-                                setEditingPost(null);
-                                setEditContent('');
-                              }}
-                              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-                            >
-                              Annuler
-                            </button>
-                            <button
-                              onClick={() => handleUpdatePost(post.id)}
-                              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            >
-                              Enregistrer
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="prose prose-lg max-w-none text-gray-700">
-                          <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-indigo-500">
-                            <p className="text-gray-800 leading-relaxed">{post.content}</p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Formulaire de réponse */}
-        {user && (
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-green-600 to-emerald-600 p-4">
-              <h3 className="text-xl font-bold text-white flex items-center">
-                <div className="text-2xl mr-2">💬</div>
-                Participer à la discussion
-              </h3>
-            </div>
-            <form onSubmit={handleCreatePost} className="p-6 space-y-4">
-              <div>
-                <textarea
-                  value={newPost}
-                  onChange={(e) => setNewPost(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                  rows={4}
-                  placeholder="Partagez votre point de vue, posez une question ou apportez une réponse..."
-                />
+          <div className="h-80 sm:h-96 lg:h-[28rem] overflow-y-auto px-3 sm:px-4 lg:px-6 py-4 space-y-4 bg-gray-50">
+            {messages.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-4xl mb-2">💬</div>
+                <p className="text-gray-500 text-sm">Soyez le premier à répondre à cette discussion</p>
               </div>
-              <div className="flex justify-end">
+            ) : (
+              Object.entries(groupedMessages).map(([dateKey, dayMessages]) => (
+                <div key={dateKey} className="space-y-3">
+                  {/* Séparateur de jour */}
+                  <div className="flex items-center gap-3 my-4">
+                    <div className="flex-1 h-px bg-gray-300"></div>
+                    <div className="px-3 py-1 bg-orange-100 text-orange-600 rounded-full text-xs sm:text-sm font-medium whitespace-nowrap">
+                      {dateKey}
+                    </div>
+                    <div className="flex-1 h-px bg-gray-300"></div>
+                  </div>
+                  
+                  {/* Messages du jour */}
+                  {dayMessages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
+                    >
+                      <div className={`flex items-start gap-2 max-w-[85%] sm:max-w-[75%] ${message.sender === 'me' ? 'flex-row-reverse' : ''}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
+                          message.sender === 'me' 
+                            ? 'bg-gradient-to-br from-green-400 to-green-500' 
+                            : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                        }`}>
+                          {message.author?.charAt(0)?.toUpperCase() || '?'}
+                        </div>
+                        <div>
+                          {message.sender !== 'me' && (
+                            <p className="text-xs font-semibold text-gray-600 mb-1 px-1">{message.author}</p>
+                          )}
+                          <div
+                            className={`px-3 py-2 rounded-2xl ${
+                              message.sender === 'me'
+                                ? 'bg-gradient-to-r from-green-400 to-green-500 text-white rounded-br-md'
+                                : 'bg-white text-gray-800 rounded-bl-md shadow-sm border border-gray-200'
+                            }`}
+                          >
+                            <p className="text-sm leading-relaxed">{message.text}</p>
+                          </div>
+                          <span className="text-xs text-gray-500 mt-1 px-1 block">{message.time}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Message Input Area */}
+          <div className="p-3 sm:p-4 bg-white border-t border-gray-200">
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-orange-300 to-yellow-300 rounded-full opacity-20"></div>
+              <div className="relative flex items-center bg-white rounded-full border border-gray-300 shadow-sm">
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Écrire une réponse..."
+                  className="flex-1 px-4 sm:px-6 py-2.5 sm:py-3 bg-transparent border-none outline-none text-gray-800 placeholder-gray-500 text-sm sm:text-base"
+                />
                 <button
-                  type="submit"
-                  disabled={submitting || !newPost.trim()}
-                  className="px-6 py-3 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-lg hover:shadow-xl"
+                  onClick={handleSendMessage}
+                  className="mr-2 p-2 text-orange-500 hover:text-orange-600 hover:bg-orange-50 rounded-full transition-all duration-200"
                 >
-                  {submitting ? 'Envoi en cours...' : '🚀 Publier ma réponse'}
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                  </svg>
                 </button>
               </div>
-            </form>
-          </div>
-        )}
-
-        {/* Message pour les utilisateurs non connectés */}
-        {!user && (
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-8 text-center">
-            <div className="text-5xl mb-4">🔐</div>
-            <h3 className="text-xl font-bold text-blue-900 mb-3">
-              Rejoignez la discussion !
-            </h3>
-            <p className="text-blue-800 mb-6 max-w-md mx-auto">
-              Connectez-vous pour partager vos idées, poser vos questions et participer à la conversation.
-            </p>
-            <div className="flex justify-center space-x-4">
-              <button
-                onClick={() => navigate('/login')}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg"
-              >
-                Se connecter
-              </button>
-              <button
-                onClick={() => navigate('/register')}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors border-2 border-blue-200"
-              >
-                Créer un compte
-              </button>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

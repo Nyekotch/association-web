@@ -22,6 +22,10 @@ export const incrementTopicViews = async (id) => {
 
 // Forum Posts
 export const getPostsByTopic = (topicId) => apiInstance.get(`/forum-posts?topicid=${topicId}`);
-export const createPost = (data) => apiInstance.post('/forum-posts', data);
+export const createPost = (data) => apiInstance.post('/forum-posts', {
+  topicid: data.topicId,
+  authorid: data.authorId,
+  content: data.content
+});
 export const updatePost = (id, data) => apiInstance.patch(`/forum-posts/${id}`, data);
 export const deletePost = (id) => apiInstance.delete(`/forum-posts/${id}`);
