@@ -223,54 +223,54 @@ function ForumPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white py-12 px-6 shadow-sm">
+      <div className="bg-white py-8 px-4 sm:px-6 lg:px-8 shadow-sm">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">Forum de l'Association</h1>
-          <p className="text-lg text-gray-600">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4">Forum de l'Association</h1>
+          <p className="text-sm sm:text-base lg:text-lg text-gray-600">
             Participez à nos discussions, posez vos questions et partagez vos expériences avec la communauté.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Main Forum Section */}
           <div className="lg:col-span-2">
             {/* Search and Create Button */}
-            <div className="flex gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-4 sm:mb-6">
               <div className="flex-1 relative">
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Rechercher..."
-                  className="w-full px-4 py-3 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-3 py-2.5 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm sm:text-base"
                 />
-                <span className="absolute left-3 top-3.5 text-gray-400">🔍</span>
+                <span className="absolute left-2.5 sm:left-4 top-2.5 sm:top-3.5 text-gray-400 text-sm sm:text-base">🔍</span>
               </div>
               {user && (
                 <button 
                   onClick={() => setShowCreateForm(!showCreateForm)}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap"
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <span className="text-xl">+</span> {showCreateForm ? 'Annuler' : 'Créer un Nouveau Sujet'}
+                  <span className="text-lg sm:text-xl">+</span> {showCreateForm ? 'Annuler' : 'Créer un Nouveau Sujet'}
                 </button>
               )}
               {!user && (
                 <button 
                   onClick={() => navigate('/login')}
-                  className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap"
+                  className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap text-sm sm:text-base w-full sm:w-auto"
                 >
-                  <span className="text-xl">+</span> Créer un Nouveau Sujet
+                  <span className="text-lg sm:text-xl">+</span> Créer un Nouveau Sujet
                 </button>
               )}
             </div>
 
             {/* Create Topic Form */}
             {showCreateForm && (
-              <div className="mb-6 bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Créer un nouveau sujet</h3>
-                <form onSubmit={handleCreateTopic} className="space-y-4">
+              <div className="mb-4 sm:mb-6 bg-white rounded-lg shadow-sm p-4 sm:p-6 border border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Créer un nouveau sujet</h3>
+                <form onSubmit={handleCreateTopic} className="space-y-3 sm:space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Titre du sujet
@@ -279,7 +279,7 @@ function ForumPage() {
                       type="text"
                       value={newTopic.title}
                       onChange={(e) => setNewTopic({ ...newTopic, title: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-3 py-2.5 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
                       placeholder="Entrez un titre clair et concis"
                       maxLength={200}
                     />
@@ -291,26 +291,26 @@ function ForumPage() {
                     <textarea
                       value={newTopic.content}
                       onChange={(e) => setNewTopic({ ...newTopic, content: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                      className="w-full px-3 py-2.5 sm:px-4 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent text-sm sm:text-base"
                       rows={4}
                       placeholder="Décrivez votre sujet en détail..."
                     />
                   </div>
-                  <div className="flex justify-end space-x-3">
+                  <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3">
                     <button
                       type="button"
                       onClick={() => {
                         setShowCreateForm(false);
                         setNewTopic({ title: '', content: '' });
                       }}
-                      className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                      className="w-full sm:w-auto px-3 py-2 sm:px-4 sm:py-2.5 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm sm:text-base"
                     >
                       Annuler
                     </button>
                     <button
                       type="submit"
                       disabled={creating}
-                      className="px-6 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="w-full sm:w-auto px-4 py-2.5 sm:px-6 sm:py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
                     >
                       {creating ? 'Création...' : '🚀 Créer le sujet'}
                     </button>
@@ -321,8 +321,8 @@ function ForumPage() {
 
             {/* Forum Table */}
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              {/* Table Header */}
-              <div className="grid grid-cols-12 gap-4 px-6 py-4 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-600">
+              {/* Table Header - Hidden on mobile */}
+              <div className="hidden lg:grid grid-cols-12 gap-4 px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 border-b border-gray-200 text-xs sm:text-sm font-medium text-gray-600">
                 <div className="col-span-5">Sujet</div>
                 <div className="col-span-2">Catégorie</div>
                 <div className="col-span-5 text-right">Réponses | Vues</div>
@@ -330,12 +330,12 @@ function ForumPage() {
 
               {/* Forum Topics */}
               {filteredTopics.length === 0 ? (
-                <div className="p-16 text-center">
-                  <div className="text-6xl mb-4">🌱</div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <div className="p-8 sm:p-12 lg:p-16 text-center">
+                  <div className="text-4xl sm:text-5xl lg:text-6xl mb-4">🌱</div>
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-900 mb-2">
                     {searchTerm || selectedCategory !== 'Tout' ? 'Aucun sujet trouvé' : 'Aucun sujet de discussion'}
                   </h3>
-                  <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                  <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6 max-w-md mx-auto">
                     {searchTerm || selectedCategory !== 'Tout' 
                       ? 'Essayez de modifier votre recherche ou votre filtre'
                       : 'Soyez le premier à lancer une conversation et à partager vos idées avec la communauté !'
@@ -344,7 +344,7 @@ function ForumPage() {
                   {user && !searchTerm && selectedCategory === 'Tout' && (
                     <button
                       onClick={() => setShowCreateForm(true)}
-                      className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
                     >
                       ✨ Créer le premier sujet
                     </button>
@@ -352,31 +352,64 @@ function ForumPage() {
                 </div>
               ) : (
                 filteredTopics.map((topic) => (
-                  <div key={topic.id} className="grid grid-cols-12 gap-4 px-6 py-5 border-b border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTopicClick(topic.id)}>
-                    <div className="col-span-5">
-                      <h3 className="font-semibold text-gray-900 mb-1 hover:text-orange-500">
-                        {topic.title}
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        Par {topic.author}, {topic.timeAgo}
-                      </p>
-                    </div>
-                    <div className="col-span-2">
-                      <span className={`${topic.categoryColor} text-white px-3 py-1 rounded-full text-sm font-medium`}>
-                        {topic.category}
-                      </span>
-                    </div>
-                    <div className="col-span-5 flex items-center justify-end gap-4">
-                      <div className="text-right">
-                        <p className="text-gray-900 font-medium">{topic.responses} | {topic.views.toLocaleString()}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-white font-medium">
-                          {topic.lastUser?.charAt(0)?.toUpperCase() || '?'}
+                  <div key={topic.id} className="border-b border-gray-200">
+                    {/* Mobile Card Layout */}
+                    <div className="lg:hidden p-4">
+                      <div className="space-y-3">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 mb-1 hover:text-orange-500">
+                              {topic.title}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              Par {topic.author}, {topic.timeAgo}
+                            </p>
+                          </div>
+                          <span className={`${topic.categoryColor} text-white px-2 py-1 rounded-full text-xs font-medium`}>
+                            {topic.category}
+                          </span>
                         </div>
-                        <div className="text-sm">
-                          <p className="font-medium text-gray-900">{topic.lastUser}</p>
-                          <p className="text-gray-500">{topic.lastActivity}</p>
+                      </div>
+                      <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-600">{topic.responses} réponses | {topic.views.toLocaleString()} vues</span>
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {topic.lastUser?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          <div className="text-xs">
+                            <p className="font-medium text-gray-900">{topic.lastUser}</p>
+                            <p className="text-gray-500">{topic.lastActivity}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Desktop Table Layout */}
+                    <div className="hidden lg:grid grid-cols-12 gap-4 px-4 sm:px-6 py-4 sm:py-5 hover:bg-gray-50 transition-colors cursor-pointer" onClick={() => handleTopicClick(topic.id)}>
+                      <div className="col-span-5">
+                        <h3 className="font-semibold text-gray-900 mb-1 hover:text-orange-500">
+                          {topic.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Par {topic.author}, {topic.timeAgo}
+                        </p>
+                      </div>
+                      <div className="col-span-2">
+                        <span className={`${topic.categoryColor} text-white px-2 py-1 rounded-full text-xs sm:text-sm font-medium`}>
+                          {topic.category}
+                        </span>
+                      </div>
+                      <div className="col-span-5 flex items-center justify-end gap-2 sm:gap-4">
+                        <div className="text-right">
+                          <p className="text-xs sm:text-sm text-gray-900 font-medium">{topic.responses} | {topic.views.toLocaleString()}</p>
+                        </div>
+                        <div className="hidden sm:flex items-center gap-2">
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gray-300 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                            {topic.lastUser?.charAt(0)?.toUpperCase() || '?'}
+                          </div>
+                          <div className="text-xs sm:text-sm">
+                            <p className="font-medium text-gray-900">{topic.lastUser}</p>
+                            <p className="text-gray-500">{topic.lastActivity}</p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -386,8 +419,8 @@ function ForumPage() {
             </div>
 
             {/* Categories Filter */}
-            <div className="mt-6 text-center">
-              <div className="inline-flex flex-wrap gap-2 text-sm">
+            <div className="mt-4 sm:mt-6 text-center">
+              <div className="inline-flex flex-wrap gap-1 sm:gap-2 text-xs sm:text-sm">
                 {categories.map((cat, index) => (
                   <span key={index}>
                     <button 
@@ -396,7 +429,7 @@ function ForumPage() {
                     >
                       {cat}
                     </button>
-                    {index < categories.length - 1 && <span className="text-gray-400 ml-2">|</span>}
+                    {index < categories.length - 1 && <span className="text-gray-400 ml-1 sm:ml-2">|</span>}
                   </span>
                 ))}
               </div>
@@ -405,18 +438,18 @@ function ForumPage() {
 
           {/* Sidebar - Popular Topics */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Sujets Populaires</h2>
-              <div className="space-y-4">
+            <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 sticky top-4 sm:top-8">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-4 sm:mb-6">Sujets Populaires</h2>
+              <div className="space-y-3 sm:space-y-4">
                 {popularTopics.map((topic, index) => (
-                  <div key={index} className="flex gap-3 pb-4 border-b border-gray-200 last:border-0">
+                  <div key={index} className="flex gap-2 sm:gap-3 pb-3 sm:pb-4 border-b border-gray-200 last:border-0">
                     <div className="flex-shrink-0">
-                      <span className="bg-green-500 text-white w-8 h-8 rounded flex items-center justify-center font-bold text-sm">
+                      <span className="bg-green-500 text-white w-6 h-6 sm:w-8 sm:h-8 rounded flex items-center justify-center font-bold text-xs sm:text-sm">
                         {topic.badge}
                       </span>
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 text-sm mb-1 hover:text-orange-500 cursor-pointer leading-tight">
+                      <h3 className="font-semibold text-gray-900 text-xs sm:text-sm mb-1 hover:text-orange-500 cursor-pointer leading-tight">
                         {topic.title}
                       </h3>
                       <p className="text-xs text-gray-500">{topic.responses} réponses</p>
@@ -426,20 +459,20 @@ function ForumPage() {
               </div>
 
               {/* Pagination */}
-              <div className="mt-6 flex items-center justify-center gap-2">
-                <button className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600">
+              <div className="mt-4 sm:mt-6 flex items-center justify-center gap-2">
+                <button className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 text-xs sm:text-sm">
                   ‹
                 </button>
-                <button className="w-8 h-8 flex items-center justify-center bg-orange-500 text-white rounded font-medium">
+                <button className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center bg-orange-500 text-white rounded text-xs sm:text-sm font-medium">
                   1
                 </button>
-                <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded">
+                <button className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded text-xs sm:text-sm">
                   2
                 </button>
-                <button className="w-8 h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded">
+                <button className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center text-gray-600 hover:bg-gray-100 rounded text-xs sm:text-sm">
                   3
                 </button>
-                <button className="text-gray-600 hover:text-gray-900 text-sm px-2">
+                <button className="text-xs sm:text-sm text-gray-600 hover:text-gray-900 px-2">
                   Suivant
                 </button>
               </div>
