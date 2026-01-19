@@ -79,16 +79,30 @@ export default function Hero() {
       <div className="relative z-20 flex h-full items-center px-8">
         <div className="max-w-2xl text-white">
           <h2 className="mb-6 text-4xl font-bold leading-tight md:text-5xl">
-            Buy data, airtime for all <br />
-            networks without charges
+            Fiers de nos racines, <br />
+            unis pour notre département
           </h2>
 
           <p className="mb-8 text-sm text-gray-200 md:text-base">
-            You can buy data, airtime for all networks (CAMTEL, neXttel, MTN,
-            Orange, Yoomee) with your preferred payment method (Mobile Money,
-            Orange Money) with <strong>no extra charge</strong>.
+            Rejoignez les fils et filles de notre terre natale pour célébrer notre culture, 
+            soutenir nos projets et construire un avenir prospère pour notre communauté. 
+            <strong>Ensemble, faisons briller notre département !</strong>
           </p>
 
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link 
+              to="/register" 
+              className="rounded-xl bg-orange-500 px-6 py-3 text-sm font-semibold hover:bg-orange-600 transition-colors text-center"
+            >
+              Rejoindre nos rangs
+            </Link>
+            <Link 
+              to="/forum" 
+              className="rounded-xl border border-white px-6 py-3 text-sm font-semibold hover:bg-white hover:text-gray-900 transition-colors text-center"
+            >
+              Discuter au forum
+            </Link>
+          </div>
 
         </div>
       </div>

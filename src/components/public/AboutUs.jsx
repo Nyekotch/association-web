@@ -1,40 +1,73 @@
 function AboutPage() {
   const values = [
     {
-      icon: "👥",
+      icon: "🤝",
       title: "Solidarité",
-      description: "Lorem ipsum dolor sit amet consectetur",
+      description: "Nous cultivons l'entraide entre les ressortissants de notre département pour soutenir nos membres dans leurs projets et défis quotidiens.",
+      color: "bg-orange-500"
+    },
+    {
+      icon: "🌱",
+      title: "Développement",
+      description: "Nous œuvrons pour le développement économique et social de notre région d'origine à travers des initiatives concrètes et durables.",
       color: "bg-green-500"
     },
     {
-      icon: "🤝",
-      title: "Partage",
-      description: "Lorem ipsum dolor sit amet consectetur",
-      color: "bg-yellow-500"
+      icon: "🏛️",
+      title: "Culture",
+      description: "Nous préservons et valorisons notre patrimoine culturel départemental en le partageant avec nos enfants et la communauté d'accueil.",
+      color: "bg-blue-500"
+    },
+    {
+      icon: "🌍",
+      title: "Diaspora",
+      description: "Nous créons des ponts entre les ressortissants restés au pays et ceux vivant à l'étranger pour un développement mutuel.",
+      color: "bg-emerald-500"
+    },
+    {
+      icon: "🎯",
+      title: "Engagement",
+      description: "Nous nous investissons avec passion dans les projets qui bénéficient directement à notre communauté départementale.",
+      color: "bg-purple-500"
     },
     {
       icon: "❤️",
-      title: "Engagement",
-      description: "Lorem ipsum dolor sit amet consectetur",
+      title: "Fraternité",
+      description: "Nous entretenons les liens familiaux et amicaux qui nous unissent en tant que fils et filles de notre terre natale.",
       color: "bg-red-500"
     }
   ];
 
-  const team = [
+  const activities = [
     {
-      name: "Emila Doon",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisque quam enim. Dignissim eius vitae ipsum. Dignissim eu elit velit duis."
+      icon: "🎓",
+      title: "Éducation",
+      description: "Bourses d'études, parrainage scolaire, soutien aux jeunes étudiants de notre département"
     },
     {
-      name: "Pericle Vania",
-      image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop",
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisque quam enim. Dignissim eius vitae ipsum. Dignissim eu elit velit duis."
+      icon: "💼",
+      title: "Entrepreneuriat",
+      description: "Soutien aux projets d'entreprises, réseau professionnel, partage d'opportunités"
     },
     {
-      name: "Projee Nalge",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
-      description: "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisque quam enim. Dignissim eius vitae ipsum. Dignissim eu elit velit duis."
+      icon: "🏥",
+      title: "Santé",
+      description: "Aide médicale d'urgence, campagnes de santé, soutien aux malades de notre communauté"
+    },
+    {
+      icon: "🎉",
+      title: "Événements",
+      description: "Rencontres annuelles, fêtes traditionnelles, célébrations culturelles départementales"
+    },
+    {
+      icon: "🤲",
+      title: "Aide sociale",
+      description: "Soutien aux familles en difficulté, aide d'urgence, entraide communautaire"
+    },
+    {
+      icon: "🌐",
+      title: "Réseau",
+      description: "Mise en relation des membres, partage d'informations, collaboration inter-départementale"
     }
   ];
 
@@ -45,51 +78,69 @@ function AboutPage() {
         {/* Notre Mission Section */}
         <section className="mb-20">
           <h1 className="text-4xl font-bold text-gray-900 mb-6">Notre Mission</h1>
-          <p className="text-gray-600 leading-relaxed max-w-4xl">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-          </p>
+          <div className="text-gray-600 leading-relaxed max-w-4xl space-y-4">
+            <p>
+              Notre association rassemble les fils et filles de notre département bien-aimé, 
+              dispersés aux quatre coins du Cameroun et du monde. Unis par nos origines communes 
+              et notre attachement à notre terre natale, nous œuvrons pour maintenir les liens 
+              fraternels qui nous unissent et contribuer au développement de notre région.
+            </p>
+            <p>
+              Que vous soyez installé dans votre région d'origine, dans une autre ville camerounaise 
+              ou à l'étranger, cette association est votre famille, votre réseau et votre soutien. 
+              Ensemble, nous pouvons préserver notre identité culturelle tout en participant activement 
+              au progrès de notre communauté et à l'épanouissement de chaque membre.
+            </p>
+          </div>
         </section>
 
         {/* Nos Valeurs Section */}
         <section className="mb-20">
           <h2 className="text-4xl font-bold text-gray-900 mb-12">Nos Valeurs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="flex flex-col items-start">
+              <div key={index} className="bg-white rounded-lg p-6 shadow-md hover:shadow-xl transition-shadow duration-300">
                 <div className={`${value.color} text-white p-4 rounded-full mb-4 text-3xl flex items-center justify-center w-16 h-16`}>
                   {value.icon}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{value.title}</h3>
-                <p className="text-gray-600 text-sm">{value.description}</p>
+                <p className="text-gray-600 text-sm leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
         </section>
 
-        {/* Notre Équipe Section */}
-        {/* <section>
-          <h2 className="text-4xl font-bold text-gray-900 mb-12">Notre Équipe</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {team.map((member, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                <img 
-                  src={member.image} 
-                  alt={member.name}
-                  className="w-full h-64 object-cover"
-                />
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{member.name}</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">
-                    {member.description}
-                  </p>
-                </div>
+        {/* Nos Activités Section */}
+        <section className="mb-20">
+          <h2 className="text-4xl font-bold text-gray-900 mb-12">Nos Activités</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activities.map((activity, index) => (
+              <div key={index} className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-lg p-6 border border-orange-200">
+                <div className="text-4xl mb-4">{activity.icon}</div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2">{activity.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{activity.description}</p>
               </div>
             ))}
           </div>
-        </section> */}
+        </section>
+
+        {/* Appel à l'action */}
+        <section className="bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl p-8 text-white text-center">
+          <h2 className="text-3xl font-bold mb-4">Rejoignez votre famille !</h2>
+          <p className="mb-6 text-lg">
+            Que vous soyez né dans notre département, d'origine départementale ou simplement 
+            attaché à notre communauté, vous avez votre place parmi nous. 
+            Ensemble, faisons briller notre région !
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button className="bg-white text-orange-500 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+              Rejoindre l'association
+            </button>
+            <button className="border-2 border-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-orange-500 transition-colors">
+              Soutenir nos projets
+            </button>
+          </div>
+        </section>
 
       </div>
     </div>
