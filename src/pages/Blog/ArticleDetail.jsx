@@ -15,7 +15,7 @@ const ArticleDetail = () => {
     const fetchArticle = async () => {
       try {
         const response = await getArticleById(id);
-        setArticle(response.data);
+        setArticle(response.data || response);
       } catch (err) {
         setError('Article non trouvé');
         console.error(err);

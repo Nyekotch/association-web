@@ -13,7 +13,7 @@ const BlogPage = () => {
     const fetchArticles = async () => {
       try {
         const response = await getAllArticles();
-        setArticles(response.data);
+        setArticles(response.data || response);
       } catch (err) {
         setError('Erreur lors du chargement des articles');
         console.error(err);
