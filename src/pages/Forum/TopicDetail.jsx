@@ -111,7 +111,11 @@ const TopicDetail = () => {
       setEditContent('');
       fetchTopicData();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la modification');
+      if (error.response?.status === 403) {
+        toast.error('Vous n\'avez pas la permission de modifier ce post');
+      } else {
+        toast.error(error.response?.data?.message || 'Erreur lors de la modification');
+      }
     }
   };
 
@@ -126,7 +130,11 @@ const TopicDetail = () => {
       toast.success('Post supprimé avec succès !');
       fetchTopicData();
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la suppression');
+      if (error.response?.status === 403) {
+        toast.error('Vous n\'avez pas la permission de supprimer ce post');
+      } else {
+        toast.error(error.response?.data?.message || 'Erreur lors de la suppression');
+      }
     } finally {
       setDeletingPost(null);
     }
@@ -158,7 +166,15 @@ const TopicDetail = () => {
   };
 
   const canEditPost = (post) => {
-    return user && post.authorid === user.id;
+    if (!user) return false;
+    // Admin et modérateur peuvent tout modifier
+    if (user.role === 'ADMIN' || user.role === 'MODERATOR') return true;
+    // L'utilisateur peut modifier son propre post
+    return post.authorid === user.id;
+  };
+
+  const canDeletePost = (post) => {
+    return canEditPost(post); // Mêmes permissions pour la modification et la suppression
   };
 
   // Grouper les messages par jour
@@ -331,37 +347,96 @@ const TopicDetail = () => {
                   </div>
                   
                   {/* Messages du jour */}
-                  {dayMessages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
-                    >
-                      <div className={`flex items-start gap-2 max-w-[85%] sm:max-w-[75%] ${message.sender === 'me' ? 'flex-row-reverse' : ''}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
-                          message.sender === 'me' 
-                            ? 'bg-gradient-to-br from-green-400 to-green-500' 
-                            : 'bg-gradient-to-br from-gray-400 to-gray-500'
-                        }`}>
-                          {message.author?.charAt(0)?.toUpperCase() || '?'}
-                        </div>
-                        <div>
-                          {message.sender !== 'me' && (
-                            <p className="text-xs font-semibold text-gray-600 mb-1 px-1">{message.author}</p>
-                          )}
-                          <div
-                            className={`px-3 py-2 rounded-2xl ${
-                              message.sender === 'me'
-                                ? 'bg-gradient-to-r from-green-400 to-green-500 text-white rounded-br-md'
-                                : 'bg-white text-gray-800 rounded-bl-md shadow-sm border border-gray-200'
-                            }`}
-                          >
-                            <p className="text-sm leading-relaxed">{message.text}</p>
+                  {dayMessages.map((message, index) => {
+                    const post = posts[index];
+                    if (!post) return null;
+                    
+                    return (
+                      <div
+                        key={message.id}
+                        className={`flex ${message.sender === 'me' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
+                      >
+                        <div className={`flex items-start gap-2 max-w-[85%] sm:max-w-[75%] ${message.sender === 'me' ? 'flex-row-reverse' : ''}`}>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 ${
+                            message.sender === 'me' 
+                              ? 'bg-gradient-to-br from-green-400 to-green-500' 
+                              : 'bg-gradient-to-br from-gray-400 to-gray-500'
+                          }`}>
+                            {message.author?.charAt(0)?.toUpperCase() || '?'}
                           </div>
-                          <span className="text-xs text-gray-500 mt-1 px-1 block">{message.time}</span>
+                          <div className="relative group">
+                            {message.sender !== 'me' && (
+                              <p className="text-xs font-semibold text-gray-600 mb-1 px-1">{message.author}</p>
+                            )}
+                            <div
+                              className={`px-3 py-2 rounded-2xl ${
+                                message.sender === 'me'
+                                  ? 'bg-gradient-to-r from-green-400 to-green-500 text-white rounded-br-md'
+                                  : 'bg-white text-gray-800 rounded-bl-md shadow-sm border border-gray-200'
+                              }`}
+                            >
+                              {editingPost === message.id ? (
+                                <div className="space-y-2">
+                                  <textarea
+                                    value={editContent}
+                                    onChange={(e) => setEditContent(e.target.value)}
+                                    className="w-full px-2 py-1 border border-gray-300 rounded text-sm resize-none"
+                                    rows={3}
+                                    placeholder="Modifier votre message..."
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleUpdatePost(message.id)}
+                                      className="px-2 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
+                                    >
+                                      Enregistrer
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setEditingPost(null);
+                                        setEditContent('');
+                                      }}
+                                      className="px-2 py-1 bg-gray-500 text-white rounded text-xs hover:bg-gray-600"
+                                    >
+                                      Annuler
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <p className="text-sm leading-relaxed">{message.text}</p>
+                              )}
+                            </div>
+                            <span className="text-xs text-gray-500 mt-1 px-1 block">{message.time}</span>
+                            
+                            {/* Options de modification/suppression */}
+                            {user && (canEditPost(post) || canDeletePost(post)) && (
+                              <div className={`absolute top-0 ${message.sender === 'me' ? 'left-0 -ml-20' : 'right-0 -mr-20'} opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex gap-1`}>
+                                {canEditPost(post) && editingPost !== message.id && (
+                                  <button
+                                    onClick={() => handleEditPost(post)}
+                                    className="p-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600"
+                                    title="Modifier"
+                                  >
+                                    ✏️
+                                  </button>
+                                )}
+                                {canDeletePost(post) && (
+                                  <button
+                                    onClick={() => handleDeletePost(message.id)}
+                                    disabled={deletingPost === message.id}
+                                    className="p-1 bg-red-500 text-white rounded text-xs hover:bg-red-600 disabled:opacity-50"
+                                    title="Supprimer"
+                                  >
+                                    🗑️
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               ))
             )}

@@ -15,6 +15,11 @@ function ForumPage() {
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
+  // Vérifier si l'utilisateur peut créer un sujet (admin ou modérateur)
+  const canCreateTopic = () => {
+    return user && (user.role === 'ADMIN' || user.role === 'MODERATOR');
+  };
+
   // Catégories disponibles
   const categories = ['Tout', 'Évènements', 'Éducation', 'Environment', 'Bénévolat', 'Projets', 'Solidarité'];
 
@@ -154,6 +159,11 @@ function ForumPage() {
       return;
     }
 
+    if (!canCreateTopic()) {
+      toast.error('Seuls les administrateurs et modérateurs peuvent créer des sujets');
+      return;
+    }
+
     if (!newTopic.title.trim() || !newTopic.content.trim()) {
       toast.error('Veuillez remplir tous les champs');
       return;
@@ -173,7 +183,11 @@ function ForumPage() {
       fetchTopics(); // Rafraîchir la liste
     } catch (error) {
       console.error('Erreur lors de la création:', error);
-      toast.error(error.response?.data?.message || 'Erreur lors de la création du sujet');
+      if (error.response?.status === 403) {
+        toast.error('Vous n\'avez pas les permissions pour créer un sujet');
+      } else {
+        toast.error(error.response?.data?.message || 'Erreur lors de la création du sujet');
+      }
     } finally {
       setCreating(false);
     }
@@ -248,15 +262,22 @@ function ForumPage() {
                 />
                 <span className="absolute left-2.5 sm:left-4 top-2.5 sm:top-3.5 text-gray-400 text-sm sm:text-base">🔍</span>
               </div>
-              {user && (
+              {user && canCreateTopic() ? (
                 <button 
                   onClick={() => setShowCreateForm(!showCreateForm)}
                   className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap text-sm sm:text-base w-full sm:w-auto"
                 >
                   <span className="text-lg sm:text-xl">+</span> {showCreateForm ? 'Annuler' : 'Créer un Nouveau Sujet'}
                 </button>
-              )}
-              {!user && (
+              ) : user ? (
+                <button 
+                  onClick={() => toast.error('Seuls les administrateurs et modérateurs peuvent créer des sujets')}
+                  className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap text-sm sm:text-base w-full sm:w-auto cursor-not-allowed opacity-75"
+                  disabled
+                >
+                  <span className="text-lg sm:text-xl">+</span> Créer un Nouveau Sujet
+                </button>
+              ) : (
                 <button 
                   onClick={() => navigate('/login')}
                   className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-medium flex items-center gap-2 whitespace-nowrap text-sm sm:text-base w-full sm:w-auto"
@@ -341,13 +362,18 @@ function ForumPage() {
                       : 'Soyez le premier à lancer une conversation et à partager vos idées avec la communauté !'
                     }
                   </p>
-                  {user && !searchTerm && selectedCategory === 'Tout' && (
+                  {user && canCreateTopic() && !searchTerm && selectedCategory === 'Tout' && (
                     <button
                       onClick={() => setShowCreateForm(true)}
                       className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200 text-sm sm:text-base"
                     >
                       ✨ Créer le premier sujet
                     </button>
+                  )}
+                  {user && !canCreateTopic() && !searchTerm && selectedCategory === 'Tout' && (
+                    <p className="text-sm text-gray-500">
+                      Seuls les administrateurs et modérateurs peuvent créer des sujets
+                    </p>
                   )}
                 </div>
               ) : (
