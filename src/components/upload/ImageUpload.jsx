@@ -34,15 +34,15 @@ const ImageUpload = ({ onImageUploaded, currentImage }) => {
 
     try {
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('image', file);
 
       console.log('Envoi du fichier...');
       const response = await uploadFile(formData);
       console.log('Réponse du serveur:', response);
       
-      const imageUrl = response.data.url.startsWith('http') 
-        ? response.data.url 
-        : `${getApiBaseUrl()}${response.data.url.startsWith('/') ? '' : '/'}${response.data.url}`;
+      const imageUrl = response.data.imageUrl.startsWith('http') 
+        ? response.data.imageUrl 
+        : `${getApiBaseUrl()}${response.data.imageUrl.startsWith('/') ? '' : '/'}${response.data.imageUrl}`;
       
       // Remplacer la prévisualisation locale par l'URL du serveur
       URL.revokeObjectURL(localPreview);
